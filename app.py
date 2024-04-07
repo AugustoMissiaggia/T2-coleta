@@ -65,29 +65,23 @@ def consultar():
     resultados = consulta(data, dado_consulta, tipo_consulta)
     return jsonify(resultados)
 
-@app.route('/atualizar-dado', methods=['GET', 'POST'])
+@app.route('/atualizar-dado', methods=['PUT'])
 def atualizar_dado():
-    if request.method == 'POST':
-        data = request.json
-    else:  # GET
-        data = request.args
-    
+    data = request.json
     atualizaDado('smoking.csv', int(data['dadoAtualizacao']), int(data['tipoAtualizacao']), data['novoValor'])
     return jsonify({"message": "Dado atualizado com sucesso"})
 
-@app.route('/dados/<int:linha>', methods=['PUT'])
-def atualizar_dados(linha):
-    dados = request.json
-    tipoAtualizacao = dados['tipoAtualizacao']
-    novoValor = dados['novoValor']
-    atualizaDado('smoking.csv', linha, tipoAtualizacao, novoValor)
-    return jsonify({"message": "Dado atualizado com sucesso"})
+@app.route('/inserir-nova-linha', methods=['POST'])
+def inserir_nova_linha_route():
+    novaLinha = request.json['novaLinha']
+    inserirNovaLinha(novaLinha)
+    return jsonify({"message": "Nova linha inserida com sucesso"})
 
-@app.route('/dados/<int:linha>', methods=['DELETE'])
-def deletar_dados(linha):
-    deletaLinha(linha)
+@app.route('/deletar-linha', methods=['DELETE'])
+def deletar_linha_route():
+    id_linha = request.json['idLinha']
+    deletaLinha(int(id_linha))
     return jsonify({"message": "Linha deletada com sucesso"})
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
