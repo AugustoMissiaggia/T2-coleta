@@ -74,4 +74,6 @@ def deletar_linha_route():
     return jsonify({"message": "Linha deletada com sucesso"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
+
+
