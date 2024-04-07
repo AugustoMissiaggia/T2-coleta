@@ -48,15 +48,10 @@ def deletaLinha(idLinha):
 
 
 
-@app.route('/consultar', methods=['GET', 'POST'])
+@app.route('/consultar', methods=['GET'])
 def consultar():
-    if request.method == 'POST':
-        req_data = request.json
-        dado_consulta = req_data['dadoConsulta']
-        tipo_consulta = req_data['tipoConsulta']
-    else:  # GET
-        dado_consulta = request.args.get('dadoConsulta')
-        tipo_consulta = request.args.get('tipoConsulta')
+    dado_consulta = request.args.get('dadoConsulta')
+    tipo_consulta = request.args.get('tipoConsulta')
     
     if not dado_consulta or not tipo_consulta:
         return jsonify({"error": "Parâmetros insuficientes"}), 400
