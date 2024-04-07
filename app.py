@@ -75,26 +75,18 @@ def atualizar_dado():
     atualizaDado('smoking.csv', int(data['dadoAtualizacao']), int(data['tipoAtualizacao']), data['novoValor'])
     return jsonify({"message": "Dado atualizado com sucesso"})
 
-@app.route('/inserir-nova-linha', methods=['GET', 'POST'])
-def inserir_nova_linha_route():
-    if request.method == 'POST':
-        data = request.json['novaLinha']
-    else:  # GET
-        data = request.args.getlist('novaLinha')
-    
-    inserirNovaLinha(data)
-    return jsonify({"message": "Nova linha inserida com sucesso"})
+@app.route('/dados/<int:linha>', methods=['PUT'])
+def atualizar_dados(linha):
+    dados = request.json
+    tipoAtualizacao = dados['tipoAtualizacao']
+    novoValor = dados['novoValor']
+    atualizaDado('smoking.csv', linha, tipoAtualizacao, novoValor)
+    return jsonify({"message": "Dado atualizado com sucesso"})
 
-@app.route('/deletar-linha', methods=['GET', 'POST'])
-def deletar_linha_route():
-    if request.method == 'POST':
-        id_linha = request.json['idLinha']
-    else:  # GET
-        id_linha = request.args.get('idLinha')
-    
-    deletaLinha(int(id_linha))
+@app.route('/dados/<int:linha>', methods=['DELETE'])
+def deletar_dados(linha):
+    deletaLinha(linha)
     return jsonify({"message": "Linha deletada com sucesso"})
-
 if __name__ == '__main__':
     app.run(debug=True)
 
