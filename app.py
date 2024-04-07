@@ -73,6 +73,11 @@ def deletar_linha_route():
     deletaLinha(int(id_linha))
     return jsonify({"message": "Linha deletada com sucesso"})
 
+
+@app.route('/')
+def hello_world():
+    return 'Hello from Koyeb'
+
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
 
