@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consulta de Dados</title>
+</head>
+<body>
+    <h1>Consulta de Dados</h1>
+    <form action="/consultar" method="POST">
+        <label for="dadoConsulta">Dado de Consulta:</label>
+        <input type="text" id="dadoConsulta" name="dadoConsulta"><br><br>
+        <label for="tipoConsulta">Tipo de Consulta:</label>
+        <input type="text" id="tipoConsulta" name="tipoConsulta"><br><br>
+        <input type="submit" value="Consultar">
+    </form>
+    <div id="resultado"></div>
+    <script>
+        // Script para enviar a solicitação AJAX e exibir o resultado
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('/consultar', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                var resultDiv = document.getElementById('resultado');
+                resultDiv.innerHTML = JSON.stringify(data, null, 2);
+            });
+        });
+    </script>
+</body>
+</html>
