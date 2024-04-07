@@ -28,7 +28,7 @@ def consultar():
     else:  # GET
         dado_consulta = request.args.get('dadoConsulta')
         tipo_consulta = request.args.get('tipoConsulta')
-
+    
     if not dado_consulta or not tipo_consulta:
         return jsonify({"error": "Parâmetros insuficientes"}), 400
 
@@ -36,56 +36,37 @@ def consultar():
     resultados = consulta(data, dado_consulta, tipo_consulta)
     return jsonify(resultados)
 
-# Função para atualizar um dado
-def atualizaDado(csv_file, dadoAtualizacao, tipoAtualizacao, novoValor):
-    with open(csv_file, 'r', newline='') as file:
-        reader = csv.reader(file)
-        linhas = list(reader)
-    linhas[dadoAtualizacao][tipoAtualizacao] = novoValor
-    with open(csv_file, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerows(linhas)
-
-@app.route('/atualizar-dado', methods=['POST'])
+@app.route('/atualizar-dado', methods=['GET', 'POST'])
 def atualizar_dado():
-    data = request.json
+    if request.method == 'POST':
+        data = request.json
+    else:  # GET
+        data = request.args
+    
     atualizaDado('smoking.csv', int(data['dadoAtualizacao']), int(data['tipoAtualizacao']), data['novoValor'])
     return jsonify({"message": "Dado atualizado com sucesso"})
 
-# Função para inserir uma nova linha
-def inserirNovaLinha(novaLinha):
-    with open('smoking.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(novaLinha)
-
-@app.route('/inserir-nova-linha', methods=['POST'])
+@app.route('/inserir-nova-linha', methods=['GET', 'POST'])
 def inserir_nova_linha_route():
-    data = request.json['novaLinha']
+    if request.method == 'POST':
+        data = request.json['novaLinha']
+    else:  # GET
+        data = request.args.getlist('novaLinha')
+    
     inserirNovaLinha(data)
     return jsonify({"message": "Nova linha inserida com sucesso"})
 
-# Função para deletar uma linha
-def deletaLinha(idLinha):
-    linhas = []
-    with open('smoking.csv', 'r', newline='') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            linhas.append(row)
-    with open('smoking.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerows(linhas[:idLinha] + linhas[idLinha+1:])
-
-@app.route('/deletar-linha', methods=['POST'])
+@app.route('/deletar-linha', methods=['GET', 'POST'])
 def deletar_linha_route():
-    id_linha = request.json['idLinha']
+    if request.method == 'POST':
+        id_linha = request.json['idLinha']
+    else:  # GET
+        id_linha = request.args.get('idLinha')
+    
     deletaLinha(int(id_linha))
     return jsonify({"message": "Linha deletada com sucesso"})
 
-
-
-
-
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=True)
 
 
