@@ -19,6 +19,35 @@ def consulta(data, dadoConsulta, tipoConsulta):
             resultados.append(item)
     return resultados
 
+
+def atualizaDado(csv_file, dadoAtualizacao, tipoAtualizacao, novoValor):
+    with open(csv_file, 'r', newline='') as file:
+        reader = csv.reader(file)
+        linhas = list(reader)
+    linhas[dadoAtualizacao][tipoAtualizacao] = novoValor
+    with open(csv_file, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(linhas)
+
+
+def inserirNovaLinha(novaLinha):
+    with open('smoking.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(novaLinha)
+
+def deletaLinha(idLinha):
+    linhas = []
+    with open('smoking.csv', 'r', newline='') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            linhas.append(row)
+    with open('smoking.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(linhas[:idLinha] + linhas[idLinha+1:])
+
+
+
+
 @app.route('/consultar', methods=['GET', 'POST'])
 def consultar():
     if request.method == 'POST':
