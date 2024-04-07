@@ -19,12 +19,20 @@ def consulta(data, dadoConsulta, tipoConsulta):
             resultados.append(item)
     return resultados
 
-@app.route('/consultar', methods=['POST'])
+@app.route('/consultar', methods=['GET', 'POST'])
 def consultar():
-    req_data = request.json
-    dado_consulta = req_data['dadoConsulta']
-    tipo_consulta = req_data['tipoConsulta']
-    data = ler_dados()  # Ler os dados toda vez que a função é chamada
+    if request.method == 'POST':
+        req_data = request.json
+        dado_consulta = req_data['dadoConsulta']
+        tipo_consulta = req_data['tipoConsulta']
+    else:  # GET
+        dado_consulta = request.args.get('dadoConsulta')
+        tipo_consulta = request.args.get('tipoConsulta')
+
+    if not dado_consulta or not tipo_consulta:
+        return jsonify({"error": "Parâmetros insuficientes"}), 400
+
+    data = ler_dados()
     resultados = consulta(data, dado_consulta, tipo_consulta)
     return jsonify(resultados)
 
@@ -73,9 +81,7 @@ def deletar_linha_route():
     deletaLinha(int(id_linha))
     return jsonify({"message": "Linha deletada com sucesso"})
 
-@app.route('/consulta')
-def pagina_consulta():
-    return render_template('consulta.html')
+
 
 
 
