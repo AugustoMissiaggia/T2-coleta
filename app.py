@@ -20,14 +20,20 @@ def consulta(data, dadoConsulta, tipoConsulta):
     return resultados
 
 
-def atualizaDado(csv_file, dadoAtualizacao, tipoAtualizacao, novoValor):
+def atualizaLinha(csv_file, linha, novosValores):
     with open(csv_file, 'r', newline='') as file:
         reader = csv.reader(file)
         linhas = list(reader)
-    linhas[dadoAtualizacao][tipoAtualizacao] = novoValor
-    with open(csv_file, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerows(linhas)
+
+    if 0 <= linha < len(linhas):
+        # Atualize a linha inteira
+        linhas[linha] = novosValores
+        with open(csv_file, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(linhas)
+    else:
+        return False  # Linha não encontrada
+    return True
 
 
 def inserirNovaLinha(novaLinha):
@@ -46,6 +52,20 @@ def deletaLinha(idLinha):
         writer.writerows(linhas[:idLinha] + linhas[idLinha+1:])
 
 
+@app.route('/pessoas', methods=['GET'])
+def obter_todas_as_pessoas():
+    data = ler_dados()
+    return jsonify(data)
+
+
+@app.route('/pessoas/<int:id_pessoa>', methods=['GET'])
+def obter_pessoa(id_pessoa):
+    data = ler_dados()
+    pessoa = next((item for item in data if int(item['id']) == id_pessoa), None)
+    if pessoa:
+        return jsonify(pessoa)
+    else:
+        return jsonify({"error": "Pessoa não encontrada"}), 404
 
 
 @app.route('/consultar', methods=['GET'])
@@ -60,11 +80,19 @@ def consultar():
     resultados = consulta(data, dado_consulta, tipo_consulta)
     return jsonify(resultados)
 
-@app.route('/atualizar-dado', methods=['PUT'])
-def atualizar_dado():
-    data = request.json
-    atualizaDado('smoking.csv', int(data['dadoAtualizacao']), int(data['tipoAtualizacao']), data['novoValor'])
-    return jsonify({"message": "Dado atualizado com sucesso"})
+@app.route('/atualizar-dado/<int:linha>', methods=['PUT'])
+def atualizar_dado(linha):
+    novosValores = request.json.get('novosValores')
+    if not novosValores:
+        return jsonify({"error": "Novos valores não fornecidos"}), 400
+
+
+    if atualizaLinha('smoking.csv', linha, novosValores):
+        return jsonify({"message": "Linha atualizada com sucesso"})
+    else:
+        return jsonify({"error": "Linha não encontrada"}), 404
+
+
 
 @app.route('/inserir-nova-linha', methods=['POST'])
 def inserir_nova_linha_route():
