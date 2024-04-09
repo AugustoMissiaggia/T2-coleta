@@ -85,14 +85,16 @@ def consultar():
     resultados = consulta(data, dado_consulta, tipo_consulta)
     return jsonify(resultados)
 
-@app.route('/atualizar-dado/<int:linha>', methods=['PUT'])
-def atualizar_dado(linha):
-    novosValores = request.json.get('novosValores')
-    if not novosValores:
-        return jsonify({"error": "Novos valores não fornecidos"}), 400
+@app.route('/atualizar-dado', methods=['PUT'])
+def atualizar_dado():
+    dados = request.json
+    linha = dados.get('linha')
+    novosValores = dados.get('novosValores')
 
+    if not linha or novosValores is None:
+        return jsonify({"error": "Linha e novos valores são necessários"}), 400
 
-    if atualizaLinha('smoking.csv', linha, novosValores):
+    if atualizaLinha('smoking.csv', int(linha), novosValores):
         return jsonify({"message": "Linha atualizada com sucesso"})
     else:
         return jsonify({"error": "Linha não encontrada"}), 404
