@@ -58,9 +58,9 @@ def obter_todas_as_pessoas():
     return jsonify(data)
 
 
-@app.route('/pessoas', methods=['GET'])
+@app.route('/pessoa-especifica', methods=['GET'])
 def obter_pessoa():
-    id_pessoa = request.args.get('id')
+    id_pessoa = request.json.get('id')
 
     if not id_pessoa:
         return jsonify({"error": "ID da pessoa é necessário"}), 400
