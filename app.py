@@ -60,13 +60,24 @@ def obter_todas_as_pessoas():
 
 @app.route('/pessoa-especifica', methods=['GET'])
 def obter_pessoa():
-    id_pessoa = request.json.get('id')
+    linha_id = request.json.get('linha')  # Obtendo o número da linha como parâmetro
 
-    if not id_pessoa:
-        return jsonify({"error": "ID da pessoa é necessário"}), 400
+    if linha_id is None:
+        return jsonify({"error": "Número da linha é necessário"}), 400
+
+    try:
+        linha_id = int(linha_id) - 1  # Convertendo para inteiro e ajustando para base 0
+    except ValueError:
+        return jsonify({"error": "Número da linha deve ser um inteiro"}), 400
 
     data = ler_dados()
-    pessoa = next((item for item in data if item['id'] == id_pessoa), None)
+
+    # Verificando se o índice da linha está dentro do intervalo do arquivo
+    if linha_id < 0 or linha_id >= len(data):
+        return jsonify({"error": "Número da linha fora do intervalo"}), 404
+
+    pessoa = data[linha_id]  # Acessando a linha diretamente
+
     if pessoa:
         return jsonify(pessoa)
     else:
